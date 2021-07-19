@@ -1,4 +1,6 @@
+from numpy import *
 from simpful import *
+import matplotlib.pylab as plt
 
 class FISNyV:
     FS = FuzzySystem()
@@ -38,6 +40,38 @@ class FISNyV:
         self.FS.set_variable("direccion_viento", viento)
         return self.FS.Mamdani_inference().get("navegacion_viento")
 
+    def plot_surface(self):
+        # Plotting surface
+        xs = []
+        ys = []
+        zs = []
+        DIVs = 20
+        for x in linspace(0, 360, DIVs):
+            for y in linspace(0, 360, DIVs):
+                NyV = self.get_nav_y_vientos(x, y)
+                xs.append(x)
+                ys.append(y)
+                zs.append(NyV)
+        xs = array(xs)
+        ys = array(ys)
+        zs = array(zs)
+
+        from mpl_toolkits.mplot3d import Axes3D
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+
+        xx, yy = plt.meshgrid(xs, ys)
+
+        ax.plot_trisurf(xs, ys, zs, vmin=0, vmax=10, cmap='gnuplot2')
+        ax.set_xlabel("Dirección Navegación")
+        ax.set_ylabel("Dirección Viento")
+        ax.set_zlabel("Calificación")
+        ax.set_title("Calificación Navegación y Vientos", pad=20)
+        ax.set_zlim(0, 10)
+        plt.tight_layout()
+        plt.show()
+
 
 test = FISNyV()
 print(test.get_nav_y_vientos(200, 280))
+test.plot_surface()
